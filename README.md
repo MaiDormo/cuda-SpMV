@@ -1,6 +1,6 @@
 # GPU-Computing-2025-256137
 
-This repository contains various implementations of Sparse Matrix-Vector Multiplication (SpMV) for both CPU and GPU, developed as part of the GPU Computing graduate course at the University of Trento.
+This repository contains various implementations of Sparse Matrix-Vector Multiplication (SpMV) for both CPU and GPU.
 
 ## Repository Structure
 ```text
