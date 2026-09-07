@@ -344,6 +344,9 @@ int main(int argc, char ** argv) {
     printf("Launch configuration: %d blocks (%d short + %d long), %d threads\n", 
            hybrid_blocks, short_blocks, hybrid_blocks - short_blocks, hybrid_threads);
 
+    // Correctness check against a double-precision CPU reference
+    verify_and_report("Hybrid Adaptive CSR", &h_csr, h_vec, h_res);
+
     // --- Cleanup ---
     if (d_short_rows) cudaFree(d_short_rows);
     if (d_long_rows) cudaFree(d_long_rows);

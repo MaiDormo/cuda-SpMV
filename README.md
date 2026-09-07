@@ -33,7 +33,14 @@ The `test/` directory contains experimental code and examples developed during l
 - **Vector (Warp-per-Row):** A kernel that assigns one warp to process each row (`spmv_gpu_vector_csr.cu`).
 - **Vector Double Buffer:** An optimized vector kernel that processes two rows per warp to improve occupancy (`spmv_gpu_vector_test_csr.cu`).
 - **Adaptive Row Blocks:** A kernel that dynamically assigns rows to either a warp or a full block based on row length (`spmv_gpu_adaptive_csr.cu`).
-- **Hybrid Adaptive:** The most advanced kernel, which classifies rows as "short" or "long" and uses a thread-per-row (scalar) or warp-per-row (vector) strategy accordingly (`spmv_gpu_hybrid_adaptive_csr.cu`).
+- **Hybrid Adaptive:** Classifies rows as "short" or "long" and uses a thread-per-row (scalar) or warp-per-row (vector) strategy accordingly (`spmv_gpu_hybrid_adaptive_csr.cu`).
+- **Hybrid V2:** The most advanced kernel (`spmv_gpu_hybrid_v2_csr.cu`, kernels in `lib/spmv_kernels.cu`, host preprocessing in `lib/hybrid_v2_plan.c`). It fixes the two failure modes of Hybrid Adaptive:
+  - *Sub-warp granularity:* each row is assigned 1, 2, 4, 8, 16 or 32 lanes of a warp from its own non-zero count, so a lane handles at most two gathers (except in the 32-lane class). This removes the serial latency chain of thread-per-row on medium rows.
+  - *Huge-row splitting:* rows above a threshold (default 2048 nnz) are cut into fixed chunks, one thread block per chunk, and a small finalize kernel sums the partials deterministically (no atomics). This removes the single-warp bottleneck on matrices like `mawi` whose longest row has 97M non-zeros.
+  - *No row list for the dominant class:* when one lane class holds more than half of the rows, its blocks walk the row range directly and skip other rows, so row-pointer reads and result writes stay coalesced.
+  - Blocks are ordered longest-work-first (chunks, then 32 lanes per row, down to 1 lane per row).
+
+  Every GPU driver now verifies its result against a double-precision CPU reference and prints a `Verification (...): PASS/FAIL` line. The Hybrid V2 driver also reports the median run time and can evict the L2 cache before every timed run (`flush_l2=1`), which matters for matrices that fit in the A30's 24 MB L2 (`662_bus`, `Zd_Jac3_db`).
 
 ## How to Compile
 
@@ -69,11 +76,24 @@ To submit all benchmark jobs to the SLURM scheduler, use the main script:
 ```
 
 ### Running Individual Implementations
-You can run benchmarks for specific implementations using their corresponding scripts (e.g., `sbatch scripts/cpu_simple_run.sh`, `sbatch scripts/run_spmv_hybrid_adaptive.sh`).
+You can run benchmarks for specific implementations using their corresponding scripts (e.g., `sbatch scripts/cpu_simple_run.sh`, `sbatch scripts/run_spmv_hybrid_adaptive.sh`, `sbatch scripts/run_spmv_hybrid_v2.sh`).
+
+The Hybrid V2 executable takes optional parameters:
+```bash
+./bin/spmv_gpu_hybrid_v2_csr.exec <file.mtx> [block_size=256] [huge_threshold=2048] [flush_l2=0]
+# the SLURM script forwards the first two: sbatch scripts/run_spmv_hybrid_v2.sh 512 4096
+```
 
 ### Running Experiments
 The repository includes scripts for running parameter sweeps:
 - **Hybrid Kernel Sweep:** Use `scripts/spmv_test.sh` to test different `(threads, threshold)` combinations for the hybrid adaptive kernel.
+
+### Host-only Tests
+The row classification of Hybrid V2 can be tested without a GPU:
+```bash
+make test-plan                       # synthetic cases
+make test-plan MTX="data/662_bus/662_bus.mtx"   # plus real matrices
+```
 
 ## Data Analysis
 

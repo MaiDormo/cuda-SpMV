@@ -19,7 +19,8 @@ BENCHMARK_SCRIPTS=(
   "cpu_simple_run.sh"
   "cpu_ilp_run.sh"
   "run_spmv_hybrid_adaptive.sh"
-  "run_cusparse.h"
+  "run_spmv_hybrid_v2.sh"
+  "run_cusparse.sh"
 )
 
 # Run each benchmark script and capture its job ID

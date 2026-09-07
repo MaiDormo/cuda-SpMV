@@ -154,6 +154,9 @@ int main(int argc, char ** argv) {
         10  // Print up to 10 samples
     );
 
+    // Correctness check against a double-precision CPU reference
+    verify_and_report("Value Blocked CSR", &h_csr, h_vec, h_res);
+
     // --- Cleanup ---
     cudaFree(d_vec);
     cudaFree(d_res);
