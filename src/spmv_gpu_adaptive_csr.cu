@@ -211,6 +211,9 @@ int main(int argc, char ** argv) {
         10
     );
 
+    // Correctness check against a double-precision CPU reference
+    verify_and_report("Adaptive CSR", &h_csr, h_vec, h_res);
+
     // --- Cleanup ---
     cudaFree(d_vec);
     cudaFree(d_res);

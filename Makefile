@@ -149,6 +149,15 @@ benchmark: release
 	@echo "Running performance benchmarks..."
 	./run_all_benchmarks.sh
 
+# Host-only unit test for the hybrid v2 row plan (no GPU needed).
+# Extra .mtx files can be passed with: make test-plan MTX="a.mtx b.mtx"
+test-plan:
+	@mkdir -p $(BIN_FOLDER)
+	$(CC) test/test_hybrid_v2_plan.c $(LIB_FOLDER)/hybrid_v2_plan.c \
+		$(LIB_FOLDER)/read_file_lib.c $(LIB_FOLDER)/coo_to_csr.c \
+		-o $(BIN_FOLDER)/test_hybrid_v2_plan $(OPT) -fopenmp
+	./$(BIN_FOLDER)/test_hybrid_v2_plan $(MTX)
+
 # Create necessary directories
 directories:
 	@mkdir -p $(BIN_FOLDER) $(OBJ_FOLDER)
@@ -194,4 +203,4 @@ help:
 	@echo "  make BUILD_TYPE=profile"
 
 # Declare phony targets
-.PHONY: all debug release profile local local-debug local-release local-profile perf pgo-generate pgo-use benchmark directories clean clean-debug clean-profile clean-release install help
+.PHONY: all debug release profile local local-debug local-release local-profile perf pgo-generate pgo-use benchmark test-plan directories clean clean-debug clean-profile clean-release install help

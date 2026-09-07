@@ -280,3 +280,78 @@ void calculate_bandwidth(int n, int m, int nnz, const int *col_indices,
     calculate_bandwidth_generic(n, m, nnz, col_indices, avg_time, 0, bandwidth, gflops);
 }
 
+
+void calculate_bandwidth_with_extra(int n, int m, int nnz, const int *col_indices,
+                                    double avg_time, size_t extra_bytes_read,
+                                    double *bandwidth, double *gflops) {
+    calculate_bandwidth_generic(n, m, nnz, col_indices, avg_time, extra_bytes_read,
+                                bandwidth, gflops);
+}
+
+static int compare_doubles(const void *a, const void *b) {
+    double da = *(const double *)a, db = *(const double *)b;
+    return (da > db) - (da < db);
+}
+
+double median_of(const double *values, int count) {
+    if (!values || count <= 0) return 0.0;
+    double *sorted = malloc(count * sizeof(double));
+    if (!sorted) return values[0];
+    memcpy(sorted, values, count * sizeof(double));
+    qsort(sorted, count, sizeof(double), compare_doubles);
+    double median = (count % 2 == 1)
+        ? sorted[count / 2]
+        : 0.5 * (sorted[count / 2 - 1] + sorted[count / 2]);
+    free(sorted);
+    return median;
+}
+
+int verify_spmv_result(const struct CSR *csr, const dtype *vec,
+                       const dtype *result, double rel_tol,
+                       double *max_rel_err, int *num_bad_rows) {
+    if (!csr || !csr->row_pointers || !csr->col_indices || !csr->values ||
+        !vec || !result || csr->num_rows <= 0 || rel_tol <= 0.0) {
+        return -1;
+    }
+
+    const int n = csr->num_rows;
+    const int *row_ptr = csr->row_pointers;
+    const int *cols = csr->col_indices;
+    const dtype *vals = csr->values;
+    double worst = 0.0;
+    int bad = 0;
+
+    #pragma omp parallel for reduction(max:worst) reduction(+:bad) schedule(dynamic, 4096)
+    for (int i = 0; i < n; i++) {
+        double ref = 0.0, scale = 0.0;
+        for (int j = row_ptr[i]; j < row_ptr[i + 1]; j++) {
+            double term = (double)vals[j] * (double)vec[cols[j]];
+            ref += term;
+            scale += fabs(term);
+        }
+        double err = fabs(ref - (double)result[i]);
+        if (scale > 0.0) err /= scale;
+        if (err > worst) worst = err;
+        if (err > rel_tol) bad++;
+    }
+
+    if (max_rel_err) *max_rel_err = worst;
+    if (num_bad_rows) *num_bad_rows = bad;
+    return bad ? 1 : 0;
+}
+
+int verify_and_report(const char *implementation_name, const struct CSR *csr,
+                      const dtype *vec, const dtype *result) {
+    double max_err = 0.0;
+    int bad = 0;
+    int status = verify_spmv_result(csr, vec, result, SPMV_VERIFY_REL_TOL,
+                                    &max_err, &bad);
+    const char *name = implementation_name ? implementation_name : "SpMV";
+    if (status < 0) {
+        printf("Verification (%s): SKIPPED (invalid input)\n", name);
+    } else {
+        printf("Verification (%s): %s (max relative error %.3e, %d row(s) above %.1e)\n",
+               name, status == 0 ? "PASS" : "FAIL", max_err, bad, SPMV_VERIFY_REL_TOL);
+    }
+    return status;
+}
