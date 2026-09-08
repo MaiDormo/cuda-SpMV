@@ -11,8 +11,8 @@
 #SBATCH --nodelist=edu01
 
 # Define executable and base directory
-EXEC=~/GPU-Computing-2025-256137/bin/spmv_gpu_hybrid_v2_csr.exec
-DATA_DIR=~/GPU-Computing-2025-256137/data
+EXEC=~/cuda-SpMV/bin/spmv_gpu_hybrid_v2_csr.exec
+DATA_DIR=~/cuda-SpMV/data
 
 # Kernel parameters (see src/spmv_gpu_hybrid_v2_csr.cu); override on the command line:
 #   sbatch scripts/run_spmv_hybrid_v2.sh 512 4096

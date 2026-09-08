@@ -10,8 +10,8 @@
 #SBATCH --error=cpu_simple_spmv_benchmark-%j.err
 
 # Define executable and base directory
-EXEC=~/GPU-Computing-2025-256137/bin/spmv_cpu_csr
-DATA_DIR=~/GPU-Computing-2025-256137/data
+EXEC=~/cuda-SpMV/bin/spmv_cpu_csr
+DATA_DIR=~/cuda-SpMV/data
 
 # Print header for results
 echo "=================================================="

@@ -8,4 +8,4 @@
 #SBATCH --job-name=test
 #SBATCH --output=test-%j.out
 #SBATCH --error=test-%j.err
-srun ~/GPU-Computing-2025-256137/test/sum_shared.exec
+srun ~/cuda-SpMV/test/sum_shared.exec

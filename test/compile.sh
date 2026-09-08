@@ -1,5 +1,5 @@
 #!/bin/bash
-# filepath: /home/elia.gatti/GPU-Computing-2025-256137/test/compile_perf.sh
+# filepath: /home/elia.gatti/cuda-SpMV/test/compile_perf.sh
 
 if [ $# -eq 0 ]; then
   echo "Usage: $0 filename.cu"
