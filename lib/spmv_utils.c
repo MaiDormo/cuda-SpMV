@@ -59,69 +59,6 @@ static void calculate_bandwidth_generic(int n, int m, int nnz, const int *col_in
     *gflops = (2.0 * nnz) / (avg_time * 1.0e9);
 }
 
-int adaptive_row_selection(const int *csr_row_ptr, int rows, int *row_blocks, 
-                           int warp_size, int block_size) {
-    const int MAX_ROWS_PER_BLOCK = block_size / warp_size;
-    const int VERY_DENSE_ROW = warp_size * 8;
-    const int MAX_NNZ_PER_BLOCK = warp_size * MAX_ROWS_PER_BLOCK * 2;
-    
-    // Pre-calculate row densities
-    int *row_nnz = malloc(rows * sizeof(int));
-    if (!row_nnz) {
-        // Fallback: simple sequential blocking
-        for (int i = 0; i <= rows; i += MAX_ROWS_PER_BLOCK) {
-            row_blocks[i / MAX_ROWS_PER_BLOCK] = (i < rows) ? i : rows;
-        }
-        return (rows + MAX_ROWS_PER_BLOCK - 1) / MAX_ROWS_PER_BLOCK + 1;
-    }
-    
-    for (int i = 0; i < rows; i++) {
-        row_nnz[i] = csr_row_ptr[i + 1] - csr_row_ptr[i];
-    }
-    
-    row_blocks[0] = 0;
-    int block_idx = 1;
-    
-    for (int row = 0; row < rows; ) {
-        int row_nnz_val = row_nnz[row];
-
-        // Strategy 1: Very dense rows get dedicated blocks
-        if (row_nnz_val > VERY_DENSE_ROW) {
-            row_blocks[block_idx++] = row + 1;
-            row++;
-            continue;
-        }
-        
-        // Strategy 2: Group similar density rows with load balancing
-        int rows_in_block = 0;
-        int total_nnz_in_block = 0;
-        int lookahead = row;
-        
-        while (lookahead < rows && rows_in_block < MAX_ROWS_PER_BLOCK) {
-            int next_row_nnz = row_nnz[lookahead];
-            
-            if (rows_in_block > 0 && total_nnz_in_block + next_row_nnz > MAX_NNZ_PER_BLOCK) {
-                break;
-            }
-            
-            total_nnz_in_block += next_row_nnz;
-            rows_in_block++;
-            lookahead++;
-        }
-        
-        // Ensure we make progress (handle edge case)
-        if (rows_in_block == 0) {
-            lookahead = row + 1;
-        }
-        
-        row_blocks[block_idx++] = lookahead;
-        row = lookahead;
-    }
-    
-    free(row_nnz);
-    return block_idx;
-}
-
 // Comparison function for qsort
 static int compare_ints(const void *a, const void *b) {
     int ia = *(const int*)a;
@@ -262,16 +199,6 @@ void calculate_hybrid_bandwidth(int n, int m, int nnz, const int *col_indices,
     // Calculate extra bytes for hybrid approach (row arrays)
     size_t extra_bytes = (size_t)num_short * sizeof(int) + (size_t)num_long * sizeof(int);
     calculate_bandwidth_generic(n, m, nnz, col_indices, avg_time, extra_bytes, bandwidth, gflops);
-}
-
-void calculate_adaptive_bandwidth(int n, int m, int nnz, const int *col_indices,
-                                int optimal_num_blocks, double avg_time,
-                                double *bandwidth, double *gflops) {
-    // Calculate extra bytes for adaptive approach (row blocks)
-    // Each CUDA block reads 2 element from row blocks array (start and end)
-    size_t extra_bytes = (size_t)optimal_num_blocks * 2 * sizeof(int);
-    calculate_bandwidth_generic(n, m, nnz, col_indices, avg_time, extra_bytes, bandwidth, gflops);                                 
-
 }
 
 void calculate_bandwidth(int n, int m, int nnz, const int *col_indices, 

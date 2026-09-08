@@ -11,11 +11,6 @@ WORKSPACE=~/GPU-Computing-2025-256137
 
 # Define all benchmark scripts to run
 BENCHMARK_SCRIPTS=(
-  "simple_run.sh"
-  "value_sequential_run.sh"
-  "value_blocked_run.sh"
-  "vector_run.sh"
-  "run_spmv_adaptive.sh"
   "cpu_simple_run.sh"
   "cpu_ilp_run.sh"
   "run_spmv_hybrid_adaptive.sh"
