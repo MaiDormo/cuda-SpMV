@@ -9,18 +9,6 @@ extern "C" {
 #endif
 
 /**
- * Determine block distribution for adaptive CSR SpMV
- *
- * @param csr_row_ptr Row pointers array from CSR matrix
- * @param rows Number of rows
- * @param row_blocks Array to store row block indices (preallocated)
- * @param warp_size Size of a warp
- * @param block_size Size of a block
- * @return Number of row blocks
- */
-int adaptive_row_selection(const int *csr_row_ptr, int rows, int *row_blocks, int warp_size, int block_size);
-
-/**
  * Calculate bandwidth and GFLOPS for standard SpMV operations
  *
  * @param n Number of rows
@@ -50,23 +38,6 @@ void calculate_bandwidth(int n, int m, int nnz, const int *col_indices,
 void calculate_hybrid_bandwidth(int n, int m, int nnz, const int *col_indices, 
                                int num_short, int num_long, double avg_time, 
                                double *bandwidth, double *gflops);
-
-/**
- * Calculate bandwidth and GFLOPS for hybrid SpMV operations
- *
- * @param n Number of rows
- * @param m Number of columns
- * @param nnz Number of non-zero elements
- * @param col_indices Column indices array
- * @param num_short Number of short rows
- * @param num_long Number of long rows
- * @param avg_time Average execution time in seconds
- * @param bandwidth Output: Memory bandwidth in GB/s
- * @param gflops Output: Computational performance in GFLOPS
- */
-void calculate_adaptive_bandwidth(int n, int m, int nnz, const int *col_indices,
-                                int optimal_num_blocks, double avg_time,
-                                double *bandwidth, double *gflops);
 
 /**
  * Bandwidth/GFLOPS with an explicit amount of extra bytes read per SpMV

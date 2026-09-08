@@ -20,20 +20,10 @@ process_benchmark_file() {
         implementation="gpu_hybrid_v2"
     elif [[ "$filename" =~ gpu_hybrid_adaptive ]] || grep -q "Hybrid Adaptive CSR" "$file"; then
         implementation="gpu_hybrid_adaptive"
-    elif [[ "$filename" =~ gpu_adaptive ]] || grep -q "Adaptive CSR" "$file"; then
-        implementation="gpu_adaptive"
     elif [[ "$filename" =~ cpu_simple ]] || grep -q "CPU Simple CSR" "$file"; then
         implementation="cpu_simple"
     elif [[ "$filename" =~ cpu_ilp ]] || grep -q "CPU ILP CSR" "$file"; then
         implementation="cpu_ilp"
-    elif [[ "$filename" =~ gpu_simple ]] || grep -q "Simple CSR" "$file"; then
-        implementation="gpu_simple"
-    elif [[ "$filename" =~ gpu_vector ]] || grep -q "Vector CSR" "$file"; then
-        implementation="gpu_vector"
-    elif [[ "$filename" =~ gpu_value_sequential ]] || grep -q "Value Sequential|CSR.*Sequential" "$file"; then
-        implementation="gpu_value_sequential"
-    elif [[ "$filename" =~ gpu_value_blocked ]] || grep -q "Value.*Blocked|Blocked.*CSR" "$file"; then
-        implementation="gpu_value_blocked"
     elif [[ "$filename" =~ cusparse ]] || grep -q "cuSPARSE" "$file"; then
         implementation="cusparse"
     fi
@@ -109,7 +99,7 @@ process_benchmark_file() {
 
 echo "Searching for SpMV benchmark output files..."
 
-benchmark_files=$(find . -maxdepth 1 -name "*.out" -type f | grep -E "(spmv|cpu_simple|cpu_ilp|gpu_simple|gpu_vector|gpu_adaptive|gpu_hybrid_adaptive|hybrid_v2|gpu_value_sequential|gpu_value_blocked|cublas|adaptive_spmv|hybrid_adaptive_spmv)" | sort)
+benchmark_files=$(find . -maxdepth 1 -name "*.out" -type f | grep -E "(spmv|cpu_simple|cpu_ilp|gpu_hybrid_adaptive|hybrid_v2|cublas|hybrid_adaptive_spmv)" | sort)
 
 if [ -z "$benchmark_files" ]; then
     echo "No benchmark output files found in current directory!"

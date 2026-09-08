@@ -22,17 +22,11 @@ The `test/` directory contains experimental code and examples developed during l
 
 ## Implementations
 
-### CPU Implementations
+### CPU Implementations (baselines)
 - **Simple CSR:** A basic, single-threaded row-per-thread implementation (`spmv_cpu_csr.c`).
 - **ILP:** A version optimized with manual loop unrolling to exploit instruction-level parallelism (`spmv_cpu_csr_ilp.c`).
 
-### GPU Implementations
-- **Simple:** A basic row-per-thread kernel (`spmv_gpu_simple_csr.cu`).
-- **Value Sequential:** A value-per-thread kernel using atomic adds, inefficient but illustrative (`spmv_gpu_value_sequential_csr.cu`).
-- **Value Blocked:** An improved value-parallel kernel with strided access (`spmv_gpu_value_blocked_csr.cu`).
-- **Vector (Warp-per-Row):** A kernel that assigns one warp to process each row (`spmv_gpu_vector_csr.cu`).
-- **Vector Double Buffer:** An optimized vector kernel that processes two rows per warp to improve occupancy (`spmv_gpu_vector_test_csr.cu`).
-- **Adaptive Row Blocks:** A kernel that dynamically assigns rows to either a warp or a full block based on row length (`spmv_gpu_adaptive_csr.cu`).
+### GPU Implementations (hybrid adaptive family)
 - **Hybrid Adaptive:** Classifies rows as "short" or "long" and uses a thread-per-row (scalar) or warp-per-row (vector) strategy accordingly (`spmv_gpu_hybrid_adaptive_csr.cu`).
 - **Hybrid V2:** The most advanced kernel (`spmv_gpu_hybrid_v2_csr.cu`, kernels in `lib/spmv_kernels.cu`, host preprocessing in `lib/hybrid_v2_plan.c`). It fixes the two failure modes of Hybrid Adaptive:
   - *Sub-warp granularity:* each row is assigned 1, 2, 4, 8, 16 or 32 lanes of a warp from its own non-zero count, so a lane handles at most two gathers (except in the 32-lane class). This removes the serial latency chain of thread-per-row on medium rows.
@@ -41,6 +35,9 @@ The `test/` directory contains experimental code and examples developed during l
   - Blocks are ordered longest-work-first (chunks, then 32 lanes per row, down to 1 lane per row).
 
   Every GPU driver now verifies its result against a double-precision CPU reference and prints a `Verification (...): PASS/FAIL` line. The Hybrid V2 driver also reports the median run time and can evict the L2 cache before every timed run (`flush_l2=1`), which matters for matrices that fit in the A30's 24 MB L2 (`662_bus`, `Zd_Jac3_db`).
+
+### Baselines
+- **cuSPARSE:** Vendor baseline in `test/cusparse.cu`, compiled via `test/compile.sh`.
 
 ## How to Compile
 
