@@ -1,4 +1,4 @@
-# GPU-Computing-2025-256137
+# cuda-SpMV
 
 This repository contains various implementations of Sparse Matrix-Vector Multiplication (SpMV) for both CPU and GPU.
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# filepath: /home/elia.gatti/GPU-Computing-2025-256137/extract_hybrid_sweep_data.sh
+# filepath: /home/elia.gatti/cuda-SpMV/extract_hybrid_sweep_data.sh
 # Script to extract hybrid adaptive SpMV configuration sweep data
 # Usage: ./extract_hybrid_sweep_data.sh [input_file] [output_file.csv]
 

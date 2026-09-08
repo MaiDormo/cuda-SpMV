@@ -1,5 +1,5 @@
 #!/bin/bash
-# filepath: /home/elia.gatti/GPU-Computing-2025-256137/run_all_benchmarks.sh
+# filepath: /home/elia.gatti/cuda-SpMV/run_all_benchmarks.sh
 
 echo "=================================================="
 echo "Starting full SpMV benchmarking suite"
@@ -7,7 +7,7 @@ echo "Started at: $(date)"
 echo "=================================================="
 
 # Path to the workspace
-WORKSPACE=~/GPU-Computing-2025-256137
+WORKSPACE=~/cuda-SpMV
 
 # Define all benchmark scripts to run
 BENCHMARK_SCRIPTS=(

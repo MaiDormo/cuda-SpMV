@@ -11,8 +11,8 @@
 #SBATCH --nodelist=edu01
 
 # Define executable and base directory
-EXEC=~/GPU-Computing-2025-256137/bin/spmv_mawi_test.exec
-DATA_DIR=~/GPU-Computing-2025-256137/data
+EXEC=~/cuda-SpMV/bin/spmv_mawi_test.exec
+DATA_DIR=~/cuda-SpMV/data
 
 # Print header for results
 echo "=================================================="
