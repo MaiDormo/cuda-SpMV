@@ -43,5 +43,18 @@ done
 ./scripts/extract_spmv_data.sh
 ```
 
+## Results (A30)
+
+Data: [`results/irregular_adaptive_vs_cusparse.csv`](results/irregular_adaptive_vs_cusparse.csv).
+
+Generate the figures locally (needs `matplotlib`):
+```bash
+python3 scripts/plot_irregular_results.py
+```
+
+![Adaptive vs cuSPARSE GFLOPS](results/figures/adaptive_vs_cusparse_gflops.png)
+
+![Adaptive / cuSPARSE ratio](results/figures/adaptive_over_cusparse_ratio.png)
+
 ## Hardware
 AMD EPYC 9334 · NVIDIA A30 24 GB · CUDA 12.5
