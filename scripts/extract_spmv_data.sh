@@ -14,11 +14,8 @@ process_benchmark_file() {
         platform="GPU"
     fi
 
-    # Implementation detection (order matters)
     local implementation="unknown"
-    if [[ "$filename" =~ hybrid_v2 ]] || grep -q "Hybrid V2 CSR" "$file"; then
-        implementation="gpu_hybrid_v2"
-    elif [[ "$filename" =~ gpu_hybrid_adaptive ]] || grep -q "Hybrid Adaptive CSR" "$file"; then
+    if [[ "$filename" =~ gpu_hybrid_adaptive ]] || grep -q "Hybrid Adaptive CSR" "$file"; then
         implementation="gpu_hybrid_adaptive"
     elif [[ "$filename" =~ cpu_simple ]] || grep -q "CPU Simple CSR" "$file"; then
         implementation="cpu_simple"
@@ -99,7 +96,7 @@ process_benchmark_file() {
 
 echo "Searching for SpMV benchmark output files..."
 
-benchmark_files=$(find . -maxdepth 1 -name "*.out" -type f | grep -E "(spmv|cpu_simple|cpu_ilp|gpu_hybrid_adaptive|hybrid_v2|cublas|hybrid_adaptive_spmv)" | sort)
+benchmark_files=$(find . -maxdepth 1 -name "*.out" -type f | grep -E "(spmv|cpu_simple|cpu_ilp|gpu_hybrid_adaptive|irregular_|cublas|hybrid_adaptive_spmv)" | sort)
 
 if [ -z "$benchmark_files" ]; then
     echo "No benchmark output files found in current directory!"

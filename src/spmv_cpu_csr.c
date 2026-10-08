@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
-#include <wchar.h>
-#include <time.h>
-#include <sys/time.h>
 
 #include "../include/my_time_lib.h"
 #include "../include/read_file_lib.h"

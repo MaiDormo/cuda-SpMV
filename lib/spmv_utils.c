@@ -6,9 +6,6 @@
 #include "../include/spmv_utils.h"
 #include "../include/spmv_type.h"
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
 // Helper function to count unique column indices
 static size_t count_unique_columns(int nnz, int m, const int *col_indices) {
     int *unique_cols = (int*)calloc(m, sizeof(int));
@@ -205,32 +202,6 @@ void calculate_bandwidth(int n, int m, int nnz, const int *col_indices,
                         double avg_time, double *bandwidth, double *gflops) {
     // No extra bytes for standard approach
     calculate_bandwidth_generic(n, m, nnz, col_indices, avg_time, 0, bandwidth, gflops);
-}
-
-
-void calculate_bandwidth_with_extra(int n, int m, int nnz, const int *col_indices,
-                                    double avg_time, size_t extra_bytes_read,
-                                    double *bandwidth, double *gflops) {
-    calculate_bandwidth_generic(n, m, nnz, col_indices, avg_time, extra_bytes_read,
-                                bandwidth, gflops);
-}
-
-static int compare_doubles(const void *a, const void *b) {
-    double da = *(const double *)a, db = *(const double *)b;
-    return (da > db) - (da < db);
-}
-
-double median_of(const double *values, int count) {
-    if (!values || count <= 0) return 0.0;
-    double *sorted = malloc(count * sizeof(double));
-    if (!sorted) return values[0];
-    memcpy(sorted, values, count * sizeof(double));
-    qsort(sorted, count, sizeof(double), compare_doubles);
-    double median = (count % 2 == 1)
-        ? sorted[count / 2]
-        : 0.5 * (sorted[count / 2 - 1] + sorted[count / 2]);
-    free(sorted);
-    return median;
 }
 
 int verify_spmv_result(const struct CSR *csr, const dtype *vec,

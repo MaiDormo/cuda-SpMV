@@ -1,11 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <sys/time.h>
-#include <omp.h>
-#include <algorithm>
-#include <unordered_map>
 
 #include "../include/read_file_lib.h"
 #include "../include/spmv_type.h"
@@ -132,37 +127,6 @@ void get_hybrid_launch_config(int n, int nnz, const int *row_ptr,
     
     printf("Launch config: %d blocks (%d short + %d long), %d threads\n", 
            blocks, *short_blocks_limit, long_blocks, threads);
-}
-
-// Refactored function to calculate hybrid-specific bandwidth
-double calculate_hybrid_bandwidth(int n, int m, int nnz, const int *col_indices, 
-                                 int num_short, int num_long, double avg_time) {
-    // Calculate memory bandwidth for hybrid approach - similar to adaptive approach
-    size_t bytes_read_vals_cols = (size_t)nnz * (sizeof(dtype) + sizeof(int));  // CSR values + column indices
-    size_t bytes_read_row_ptr = (size_t)(n + 1) * sizeof(int);                 // Row pointers (all accessed)
-    
-    // Row arrays access: each block reads its portion
-    size_t bytes_read_short_rows = (size_t)num_short * sizeof(int);
-    size_t bytes_read_long_rows = (size_t)num_long * sizeof(int);
-
-    // Count unique column indices (more accurate than assuming all vector elements)
-    int* unique_cols = (int*)calloc(m, sizeof(int));
-    size_t unique_count = 0;
-    for (int i = 0; i < nnz; i++) {
-        if (unique_cols[col_indices[i]] == 0) {
-            unique_cols[col_indices[i]] = 1;
-            unique_count++;
-        }
-    }
-    free(unique_cols);
-
-    size_t bytes_read_vec = unique_count * sizeof(dtype);
-    size_t bytes_read = bytes_read_vals_cols + bytes_read_row_ptr + bytes_read_vec + 
-                       bytes_read_short_rows + bytes_read_long_rows;
-    size_t bytes_written = (size_t)n * sizeof(dtype);
-    size_t total_bytes = bytes_read + bytes_written;
-
-    return total_bytes / (avg_time * 1.0e9);
 }
 
 // --- Main Function ---

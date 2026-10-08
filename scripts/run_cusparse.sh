@@ -10,34 +10,27 @@
 #SBATCH --error=cusparse_spmv-%j.err
 #SBATCH --nodelist=edu01
 
-# Define executable and base directory
 EXEC=~/cuda-SpMV/test/cusparse.exec
 DATA_DIR=~/cuda-SpMV/data
+# shellcheck source=/dev/null
+source ~/cuda-SpMV/scripts/irregular_datasets.sh
+DATASETS=("${IRREGULAR_CORE[@]}")
 
-# Print header for results
 echo "=================================================="
-echo "SpMV Benchmark Results"
+echo "SpMV Benchmark Results (cuSPARSE)"
 echo "=================================================="
 echo "Started at: $(date)"
 echo ""
-
-# Define datasets to test
-DATASETS=(
-  "662_bus/662_bus.mtx"
-  "Goodwin_127/Goodwin_127.mtx"
-  "ML_Geer/ML_Geer.mtx"
-  "Zd_Jac3_db/Zd_Jac3_db.mtx"
-  "mawi_201512020330/mawi_201512020330.mtx"
-  "CurlCurl_4/CurlCurl_4.mtx"
-)
-
 nvidia-smi
 
-# Run benchmark for each dataset
 for dataset in "${DATASETS[@]}"; do
   echo "------------------------------------------------"
   echo "Testing dataset: $dataset"
   echo "------------------------------------------------"
+  if [[ ! -f "$DATA_DIR/$dataset" ]]; then
+    echo "MISSING $DATA_DIR/$dataset — skip"
+    continue
+  fi
   srun $EXEC $DATA_DIR/$dataset
   echo ""
 done
