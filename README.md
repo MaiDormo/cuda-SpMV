@@ -28,7 +28,7 @@ The table is the average over 50 timed runs (warm-up excluded). Raw data:
 peak**, and it beats cuSPARSE on a matrix with 14.4M non-zeros (larger than the 24 MB L2).
 `662_bus` and `Zd_Jac3_db` fit in L2, so their ratios are flattered; `mawi` is the honest
 counterexample. The CSV's baseline column is labelled `cublas`, but the code is
-[`test/cusparse.cu`](test/cusparse.cu) — it is the cuSPARSE CSR baseline.
+[`test/cusparse.cu`](test/cusparse.cu); it is the cuSPARSE CSR baseline.
 
 ![Bandwidth](results/plots/bandwidth.png)
 
@@ -49,17 +49,17 @@ the thesis is being written.
 
 CPU baselines:
 
-- `spmv_cpu_csr.c` — one row per thread.
-- `spmv_cpu_csr_ilp.c` — manual unrolling for instruction-level parallelism.
+- `spmv_cpu_csr.c`: one row per thread.
+- `spmv_cpu_csr_ilp.c`: manual unrolling for instruction-level parallelism.
 
 GPU kernels:
 
-- `spmv_gpu_simple_csr.cu` — row-per-thread.
-- `spmv_gpu_value_sequential_csr.cu` — value-per-thread with atomics (illustrative).
-- `spmv_gpu_value_blocked_csr.cu` — value-parallel with strided access.
-- `spmv_gpu_vector_csr.cu` — warp-per-row.
-- `spmv_gpu_adaptive_csr.cu` — warp or block per row, chosen from row length.
-- `spmv_gpu_hybrid_adaptive_csr.cu` — **the kernel in the table**: short rows use
+- `spmv_gpu_simple_csr.cu`: row-per-thread.
+- `spmv_gpu_value_sequential_csr.cu`: value-per-thread with atomics (illustrative).
+- `spmv_gpu_value_blocked_csr.cu`: value-parallel with strided access.
+- `spmv_gpu_vector_csr.cu`: warp-per-row.
+- `spmv_gpu_adaptive_csr.cu`: warp or block per row, chosen from row length.
+- `spmv_gpu_hybrid_adaptive_csr.cu`: **the kernel in the table**: short rows use
   thread-per-row, long rows use warp-per-row; `__ldg()` for read-only loads and
   `__shfl_down_sync()` for warp reductions.
 

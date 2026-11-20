@@ -9,7 +9,7 @@ or CV must be traceable to a run that follows these rules.
    independent reference, never against another GPU kernel. Here the oracle
    is the double-precision CPU CSR reference; every driver prints
    `Verification (...): PASS/FAIL`. A benchmark row with FAIL (or without
-   the line) does not exist — do not record it, do not average it in.
+   the line) does not exist; do not record it, do not average it in.
 2. **Fixed fixtures, recorded conditions.** Matrices are fixtures: record
    name, rows, nnz, longest row (see `scripts/download_matrices.sh` for the
    canonical set). Every result row must carry: GPU model, CUDA
@@ -17,7 +17,7 @@ or CV must be traceable to a run that follows these rules.
    not), cache-flush policy, run count, warmup policy. Same fixture +
    same conditions or the comparison is void.
 3. **Evidence rules.** Median over ≥5 timed runs, warmup excluded (drivers
-   already do a warmup run — keep it). Report GFLOPS *and* GB/s *and* % of
+   already do a warmup run; keep it). Report GFLOPS *and* GB/s *and* % of
    the cuSPARSE baseline on the same fixture, same line. Stop measuring once
    alternatives are distinguished; more runs do not make a weak claim strong.
    Nsight (`ncu`) answers kernel questions (top 3 limiters); end-to-end
