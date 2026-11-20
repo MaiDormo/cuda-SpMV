@@ -42,9 +42,8 @@ scheduling blocks rather than moving data. cuSPARSE's generalized scheduling is 
 there.
 
 That diagnosis is the bridge to my M.S. thesis: if row-based work decomposition breaks on
-irregular graphs, partition the non-zeros instead of the rows. The thesis,
-[`dist-patoh`](https://github.com/MaiDormo/dist-patoh-case-study), does that for hypergraph
-partitioning.
+irregular graphs, partition the non-zeros instead of the rows. My M.S. thesis, `dist-patoh`, does that for hypergraph partitioning. Code is private while
+the thesis is being written.
 
 ## Implementations
 
