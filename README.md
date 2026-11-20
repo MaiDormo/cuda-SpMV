@@ -10,6 +10,10 @@ irregular matrices and loses badly on the 226M-row `mawi` graph**, and the reaso
 measurable: more than 800,000 CUDA blocks and per-row scheduling overhead. That failure is what
 led to the non-zero-based partitioning thesis.
 
+The full Deliverable 2 report, including the kernel pseudocode, launch-parameter tuning, and the
+cuSPARSE discussion, is in
+[`report/second_deliverable_gpu_computing_elia_gatti.pdf`](report/second_deliverable_gpu_computing_elia_gatti.pdf).
+
 ## Results (NVIDIA A30, 24 GB HBM2, CUDA 12.5)
 
 The table is the average over 50 timed runs (warm-up excluded). Raw data:
