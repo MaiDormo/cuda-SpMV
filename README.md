@@ -12,8 +12,7 @@ led to the non-zero-based partitioning thesis.
 
 ## Results (NVIDIA A30, 24 GB HBM2, CUDA 12.5)
 
-The table is the median over 50 timed runs (warm-up excluded). Every GPU result is verified
-against a double-precision CPU CSR reference. Raw data:
+The table is the average over 50 timed runs (warm-up excluded). Raw data:
 [`results/spmv_benchmark_results_second_deliverable.csv`](results/spmv_benchmark_results_second_deliverable.csv).
 
 | Matrix | Rows | NNZ | Hybrid GB/s | cuSPARSE GB/s | Hybrid / cuSPARSE | Hybrid GFLOPS |
@@ -82,4 +81,4 @@ The measurement rules are in [`docs/methodology.md`](docs/methodology.md): verif
 against the CPU reference, record the hardware and flags, report GB/s and GFLOPS together, and
 never publish a row with a failed verification.
 
-Hardware: AMD EPYC 9334 (32C/64T), NVIDIA A30 24 GB, CUDA 12.5.0, GCC 13.
+Hardware: AMD EPYC 9334 (32C/64T), NVIDIA A30 24 GB, CUDA 12.5.0.

@@ -23,17 +23,19 @@ or CV must be traceable to a run that follows these rules.
    Nsight (`ncu`) answers kernel questions (top 3 limiters); end-to-end
    claims need end-to-end timing, never kernel-only math.
 
-## Already in place (do not regress)
+## Already in place
 
-- FP64 CPU reference + `Verification (...): PASS/FAIL` in every GPU driver.
-- Warmup run excluded from timing in all drivers (`src/*`).
-- Median timing in the Hybrid Adaptive driver.
+- 50 timed runs per matrix, warm-up excluded, averaged (legacy Deliverable 2
+  drivers).
 - CSV extract scripts (`scripts/extract_spmv_data.sh`, `extract_test.sh`).
 - cuSPARSE vendor baseline (`test/cusparse.cu` via `test/compile.sh`).
 - Cloud build path: `make local` (direct `nvcc`, no UniTN modules).
 
-## Gaps (fix before publishing numbers)
+## Gaps (fix before claiming more)
 
+- [ ] FP64 CPU reference + `Verification (...): PASS/FAIL` is **not** in the
+      legacy drivers on `main`. The experimental V2 branch has a verifier; do not
+      attribute it to the Deliverable 2 numbers.
 - [ ] Lock GPU clocks during timed runs (`sudo nvidia-smi -lgc`), record it.
 - [ ] Pin the fixture set: minimum publishable = 3 matrices (small/L2-resident
       e.g. `662_bus`, one medium, one huge-row e.g. `mawi`) + longest-row stat.
